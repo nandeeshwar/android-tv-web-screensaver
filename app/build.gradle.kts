@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nandeesh.screensaver"
+    namespace = "app.digiplex.screensaver"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.nandeesh.screensaver"
+        applicationId = "app.digiplex.screensaver"
         minSdk = 21
         targetSdk = 35
         versionCode = 1
@@ -36,4 +36,6 @@ dependencies {
     implementation("androidx.leanback:leanback-preference:1.2.0")
     implementation("androidx.fragment:fragment-ktx:1.8.5")
     implementation("androidx.webkit:webkit:1.12.1")
+    implementation("com.google.zxing:core:3.5.3")
+    implementation("org.nanohttpd:nanohttpd:2.3.1")
 }

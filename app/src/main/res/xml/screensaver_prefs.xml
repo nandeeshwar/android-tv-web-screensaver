@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
-        android:defaultValue="https://www.example.com"
-        android:key="screensaver_url"
-        android:summary="The website to display as your screensaver"
-        android:title="Website URL" />
+    <Preference
+        android:key="manage_urls"
+        android:summary="Add, select, or remove saved URLs"
+        android:title="Manage URLs" />
 
     <SwitchPreference
         android:defaultValue="true"

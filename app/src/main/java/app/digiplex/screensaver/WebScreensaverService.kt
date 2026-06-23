@@ -1,7 +1,8 @@
-package com.nandeesh.screensaver
+package app.digiplex.screensaver
 
 import android.annotation.SuppressLint
 import android.service.dreams.DreamService
+import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -27,8 +28,8 @@ class WebScreensaverService : DreamService() {
             settings.javaScriptEnabled = prefs.javaScriptEnabled
             settings.domStorageEnabled = true
             settings.mediaPlaybackRequiresUserGesture = false
-            setLayerType(LAYER_TYPE_HARDWARE, null)
-            loadUrl(prefs.url)
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
+            loadUrl(prefs.activeUrl)
         }
     }
 

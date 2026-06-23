@@ -1,4 +1,4 @@
-package com.nandeesh.screensaver
+package app.digiplex.screensaver
 
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity

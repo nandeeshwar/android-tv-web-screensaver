@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-feature
         android:name="android.software.leanback"
@@ -32,6 +34,16 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="true"
+            android:theme="@style/Theme.Screensaver" />
+
+        <activity
+            android:name=".QrInputActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Screensaver" />
+
+        <activity
+            android:name=".UrlListActivity"
+            android:exported="false"
             android:theme="@style/Theme.Screensaver" />
 
     </application>
