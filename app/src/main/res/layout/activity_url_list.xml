@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#111111"
+    android:orientation="vertical"
+    android:padding="40dp">
+
+    <!-- Add URL section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="32dp">
+
+        <!-- Left: Manual entry -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingEnd="40dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add URL"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:layout_marginBottom="16dp" />
+
+            <EditText
+                android:id="@+id/url_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#222222"
+                android:hint="https://example.com"
+                android:imeOptions="actionDone"
+                android:inputType="textUri"
+                android:padding="16dp"
+                android:textColor="#EEEEEE"
+                android:textColorHint="#666666"
+                android:textSize="18sp"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/add_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#3355FF"
+                android:padding="14dp"
+                android:text="Add to list"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="#333333" />
+
+        <!-- Right: QR code -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="40dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Or scan with phone"
+                android:textColor="#AAAAAA"
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
+
+            <ImageView
+                android:id="@+id/qr_image"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:background="#FFFFFF"
+                android:padding="6dp"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/qr_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="#8888FF"
+                android:textSize="13sp"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- Separator -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#333333"
+        android:layout_marginBottom="16dp" />
+
+    <!-- URL list header -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saved URLs"
+        android:textColor="#AAAAAA"
+        android:textSize="14sp"
+        android:textAllCaps="true"
+        android:letterSpacing="0.1"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Empty state -->
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="No URLs saved yet"
+        android:textColor="#666666"
+        android:textSize="18sp"
+        android:visibility="gone" />
+
+    <!-- URL list -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/url_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

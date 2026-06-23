@@ -1,19 +1,24 @@
 package app.digiplex.screensaver
 
-import android.content.Intent
 import android.graphics.Color
-import android.graphics.Typeface
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.net.Inet4Address
+import java.net.NetworkInterface
 
 class UrlListActivity : FragmentActivity() {
 
@@ -21,87 +26,34 @@ class UrlListActivity : FragmentActivity() {
     private lateinit var adapter: UrlAdapter
     private lateinit var emptyView: TextView
     private lateinit var recyclerView: RecyclerView
+    private lateinit var urlInput: EditText
+    private var server: InputServer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_url_list)
 
         prefs = ScreensaverPrefs(this)
 
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(Color.parseColor("#111111"))
-            setPadding(48, 48, 48, 48)
-        }
+        urlInput = findViewById(R.id.url_input)
+        val addButton = findViewById<Button>(R.id.add_button)
+        emptyView = findViewById(R.id.empty_view)
+        recyclerView = findViewById(R.id.url_list)
 
-        val header = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { bottomMargin = 32 }
-        }
-
-        header.addView(TextView(this).apply {
-            text = "Saved URLs"
-            setTextColor(Color.WHITE)
-            textSize = 28f
-            layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-        })
-
-        header.addView(TextView(this).apply {
-            text = "[+] Add via QR"
-            setTextColor(Color.parseColor("#8888FF"))
-            textSize = 18f
-            isFocusable = true
-            isFocusableInTouchMode = true
-            setPadding(24, 12, 24, 12)
-            setBackgroundColor(Color.parseColor("#222222"))
-            setOnClickListener {
-                startActivity(Intent(this@UrlListActivity, QrInputActivity::class.java))
-            }
-            setOnKeyListener { _, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-                    performClick()
-                    true
-                } else false
-            }
-            setOnFocusChangeListener { v, hasFocus ->
-                (v as TextView).setBackgroundColor(
-                    if (hasFocus) Color.parseColor("#333366") else Color.parseColor("#222222")
-                )
-            }
-        })
-
-        root.addView(header)
-
-        emptyView = TextView(this).apply {
-            text = "No URLs saved yet.\nAdd one using the QR button above."
-            setTextColor(Color.parseColor("#AAAAAA"))
-            textSize = 18f
-            gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            visibility = View.GONE
-        }
-
-        recyclerView = RecyclerView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            layoutManager = LinearLayoutManager(this@UrlListActivity)
-        }
-
+        recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = UrlAdapter()
         recyclerView.adapter = adapter
 
-        root.addView(recyclerView)
-        root.addView(emptyView)
+        addButton.setOnClickListener { addUrlFromInput() }
 
-        setContentView(root)
+        urlInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                addUrlFromInput()
+                true
+            } else false
+        }
+
+        setupQrCode()
     }
 
     override fun onResume() {
@@ -109,21 +61,91 @@ class UrlListActivity : FragmentActivity() {
         refreshList()
     }
 
+    override fun onDestroy() {
+        server?.stop()
+        server = null
+        super.onDestroy()
+    }
+
+    private fun addUrlFromInput() {
+        val url = urlInput.text.toString().trim()
+        if (url.isEmpty()) return
+
+        val finalUrl = if (!url.startsWith("http://") && !url.startsWith("https://")) {
+            "https://$url"
+        } else url
+
+        prefs.addUrl(finalUrl)
+        urlInput.text.clear()
+        refreshList()
+        Toast.makeText(this, "Added: $finalUrl", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupQrCode() {
+        val qrImage = findViewById<ImageView>(R.id.qr_image)
+        val qrStatus = findViewById<TextView>(R.id.qr_status)
+
+        val ip = getDeviceIp()
+        if (ip == null) {
+            qrStatus.text = "No network"
+            qrImage.visibility = View.GONE
+            return
+        }
+
+        val serverUrl = "http://$ip:${InputServer.PORT}"
+        qrStatus.text = serverUrl
+        qrImage.setImageBitmap(QrCodeGenerator.generate(serverUrl, 512))
+
+        server = InputServer(InputServer.PORT) { url ->
+            prefs.addUrl(url)
+            runOnUiThread {
+                refreshList()
+                Toast.makeText(this, "Added via phone: $url", Toast.LENGTH_SHORT).show()
+            }
+        }
+        server?.start()
+    }
+
     private fun refreshList() {
         val urls = prefs.getUrls()
-        adapter.update(urls, prefs.activeUrl)
+        adapter.update(urls)
         emptyView.visibility = if (urls.isEmpty()) View.VISIBLE else View.GONE
         recyclerView.visibility = if (urls.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun getDeviceIp(): String? {
+        try {
+            val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as? WifiManager
+            val wifiIp = wifiManager?.connectionInfo?.ipAddress
+            if (wifiIp != null && wifiIp != 0) {
+                return "%d.%d.%d.%d".format(
+                    wifiIp and 0xff,
+                    wifiIp shr 8 and 0xff,
+                    wifiIp shr 16 and 0xff,
+                    wifiIp shr 24 and 0xff
+                )
+            }
+        } catch (_: Exception) {}
+
+        try {
+            for (iface in NetworkInterface.getNetworkInterfaces()) {
+                for (addr in iface.inetAddresses) {
+                    if (!addr.isLoopbackAddress && addr is Inet4Address) {
+                        return addr.hostAddress
+                    }
+                }
+            }
+        } catch (_: Exception) {}
+
+        return null
     }
 
     inner class UrlAdapter : RecyclerView.Adapter<UrlAdapter.ViewHolder>() {
 
         private var urls = listOf<String>()
-        private var selectedUrl = ""
 
-        fun update(urls: List<String>, selected: String) {
+        fun update(urls: List<String>) {
             this.urls = urls
-            this.selectedUrl = selected
             notifyDataSetChanged()
         }
 
@@ -139,10 +161,6 @@ class UrlListActivity : FragmentActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 ).apply { bottomMargin = 4 }
-            }
-
-            val indicator = View(parent.context).apply {
-                layoutParams = LinearLayout.LayoutParams(8, 48).apply { rightMargin = 16 }
             }
 
             val urlText = TextView(parent.context).apply {
@@ -166,27 +184,17 @@ class UrlListActivity : FragmentActivity() {
                 alpha = 0.5f
             }
 
-            row.addView(indicator)
             row.addView(urlText)
             row.addView(deleteBtn)
 
-            return ViewHolder(row, indicator, urlText, deleteBtn)
+            return ViewHolder(row, urlText, deleteBtn)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val url = urls[position]
-            val isSelected = url == selectedUrl
 
             holder.urlText.text = url
-            holder.urlText.setTypeface(null, if (isSelected) Typeface.BOLD else Typeface.NORMAL)
-            holder.indicator.setBackgroundColor(
-                if (isSelected) Color.parseColor("#44CC44") else Color.TRANSPARENT
-            )
 
-            holder.row.setOnClickListener {
-                prefs.setSelected(url)
-                refreshList()
-            }
             holder.row.setOnFocusChangeListener { v, hasFocus ->
                 v.setBackgroundColor(
                     if (hasFocus) Color.parseColor("#2A2A2A") else Color.parseColor("#1A1A1A")
@@ -209,7 +217,6 @@ class UrlListActivity : FragmentActivity() {
 
         inner class ViewHolder(
             val row: LinearLayout,
-            val indicator: View,
             val urlText: TextView,
             val deleteBtn: ImageView
         ) : RecyclerView.ViewHolder(row)

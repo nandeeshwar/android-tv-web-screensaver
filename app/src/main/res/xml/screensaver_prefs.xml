@@ -3,8 +3,13 @@
 
     <Preference
         android:key="manage_urls"
-        android:summary="Add, select, or remove saved URLs"
+        android:summary="Add or remove URLs"
         android:title="Manage URLs" />
+
+    <ListPreference
+        android:key="screensaver_selected_url"
+        android:summary="None selected"
+        android:title="Default URL" />
 
     <SwitchPreference
         android:defaultValue="true"
