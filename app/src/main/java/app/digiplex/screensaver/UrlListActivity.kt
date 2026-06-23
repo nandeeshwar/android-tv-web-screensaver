@@ -1,7 +1,6 @@
 package app.digiplex.screensaver
 
 import android.graphics.Color
-import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
@@ -17,8 +16,6 @@ import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import java.net.Inet4Address
-import java.net.NetworkInterface
 
 class UrlListActivity : FragmentActivity() {
 
@@ -97,9 +94,9 @@ class UrlListActivity : FragmentActivity() {
 
     private fun setupQrCode() {
         val qrImage = findViewById<ImageView>(R.id.qr_image)
-        val qrStatus = findViewById     <TextView>(R.id.qr_status)
+        val qrStatus = findViewById<TextView>(R.id.qr_status)
 
-        val ip = getDeviceIp()
+        val ip = NetworkUtil.getDeviceIp()
         if (ip == null) {
             qrStatus.text = "No network"
             qrImage.visibility = View.GONE
@@ -125,33 +122,6 @@ class UrlListActivity : FragmentActivity() {
         adapter.update(urls)
         emptyView.visibility = if (urls.isEmpty()) View.VISIBLE else View.GONE
         recyclerView.visibility = if (urls.isEmpty()) View.GONE else View.VISIBLE
-    }
-
-    private fun getDeviceIp(): String? {
-        try {
-            val wifiManager = applicationContext.getSystemService(WIFI_SERVICE) as? WifiManager
-            val wifiIp = wifiManager?.connectionInfo?.ipAddress
-            if (wifiIp != null && wifiIp != 0) {
-                return "%d.%d.%d.%d".format(
-                    wifiIp and 0xff,
-                    wifiIp shr 8 and 0xff,
-                    wifiIp shr 16 and 0xff,
-                    wifiIp shr 24 and 0xff
-                )
-            }
-        } catch (_: Exception) {}
-
-        try {
-            for (iface in NetworkInterface.getNetworkInterfaces()) {
-                for (addr in iface.inetAddresses) {
-                    if (!addr.isLoopbackAddress && addr is Inet4Address) {
-                        return addr.hostAddress
-                    }
-                }
-            }
-        } catch (_: Exception) {}
-
-        return null
     }
 
     inner class UrlAdapter : RecyclerView.Adapter<UrlAdapter.ViewHolder>() {
