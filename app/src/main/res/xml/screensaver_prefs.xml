@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="https://www.example.com"
+        android:key="screensaver_url"
+        android:summary="The website to display as your screensaver"
+        android:title="Website URL" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="enable_javascript"
+        android:summary="Required for most modern websites"
+        android:title="Enable JavaScript" />
+
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="enable_interaction"
+        android:summary="Allow navigating the website with the remote"
+        android:title="Interactive mode" />
+
+</PreferenceScreen>
