@@ -12,8 +12,14 @@ class InputServer(
             val body = mutableMapOf<String, String>()
             session.parseBody(body)
             val params = session.parameters
-            val url = params["url"]?.firstOrNull()?.trim().orEmpty()
-            if (url.isNotEmpty()) {
+            val rawUrl = params["url"]?.firstOrNull()?.trim().orEmpty()
+            if (rawUrl.isNotEmpty()) {
+                val url = if (!rawUrl.startsWith("http://") && !rawUrl.startsWith("https://")) {
+                    "https://$rawUrl"
+                } else rawUrl
+                if (!isValidUrl(url)) {
+                    return newFixedLengthResponse(Response.Status.OK, "text/html", errorHtml(rawUrl))
+                }
                 onUrlSubmitted(url)
                 return newFixedLengthResponse(Response.Status.OK, "text/html", successHtml(url))
             }
@@ -47,6 +53,41 @@ class InputServer(
         </html>
     """.trimIndent()
 
+    private fun isValidUrl(url: String): Boolean {
+        return try {
+            val parsed = java.net.URL(url)
+            parsed.protocol in listOf("http", "https") && parsed.host.contains(".")
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun errorHtml(input: String): String = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body { font-family: -apple-system, system-ui, sans-serif; max-width: 480px;
+                       margin: 40px auto; padding: 0 20px; background: #111; color: #eee; }
+                .card { background: #3a1a1a; border-radius: 12px; padding: 24px; text-align: center; }
+                .icon { font-size: 48px; margin-bottom: 12px; }
+                .input { color: #f88; word-break: break-all; font-size: 14px; margin-top: 12px; }
+                a { color: #8af; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <div class="icon">&#10007;</div>
+                <h2>Invalid URL</h2>
+                <p class="input">${input.replace("<", "&lt;").replace(">", "&gt;")}</p>
+                <p>Please enter a valid website address<br>(e.g. www.example.com)</p>
+                <p><a href="/">Try again</a></p>
+            </div>
+        </body>
+        </html>
+    """.trimIndent()
+
     companion object {
         const val PORT = 8888
 
@@ -59,9 +100,9 @@ class InputServer(
                     body { font-family: -apple-system, system-ui, sans-serif; max-width: 480px;
                            margin: 40px auto; padding: 0 20px; background: #111; color: #eee; }
                     h2 { text-align: center; }
-                    input[type=url] { width: 100%; padding: 14px; font-size: 16px; border: 2px solid #444;
+                    input[type=text] { width: 100%; padding: 14px; font-size: 16px; border: 2px solid #444;
                                       border-radius: 8px; background: #222; color: #eee; box-sizing: border-box; }
-                    input[type=url]:focus { border-color: #58f; outline: none; }
+                    input[type=text]:focus { border-color: #58f; outline: none; }
                     button { width: 100%; padding: 14px; font-size: 16px; margin-top: 12px;
                              background: #38f; color: white; border: none; border-radius: 8px; cursor: pointer; }
                     button:hover { background: #26d; }
@@ -70,7 +111,7 @@ class InputServer(
             <body>
                 <h2>TV Web Screensaver</h2>
                 <form method="POST">
-                    <input type="url" name="url" placeholder="https://example.com"
+                    <input type="text" name="url" placeholder="www.example.com"
                            required autofocus autocapitalize="off" autocorrect="off" />
                     <button type="submit">Set URL</button>
                 </form>

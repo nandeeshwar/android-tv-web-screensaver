@@ -21,6 +21,7 @@ class SettingsFragment : LeanbackPreferenceFragmentCompat() {
             refreshUrlPreferences()
             true
         }
+
     }
 
     override fun onResume() {

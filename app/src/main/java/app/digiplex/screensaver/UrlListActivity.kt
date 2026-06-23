@@ -68,12 +68,17 @@ class UrlListActivity : FragmentActivity() {
     }
 
     private fun addUrlFromInput() {
-        val url = urlInput.text.toString().trim()
-        if (url.isEmpty()) return
+        val raw = urlInput.text.toString().trim()
+        if (raw.isEmpty()) return
 
-        val finalUrl = if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            "https://$url"
-        } else url
+        val finalUrl = if (!raw.startsWith("http://") && !raw.startsWith("https://")) {
+            "https://$raw"
+        } else raw
+
+        if (!isValidUrl(finalUrl)) {
+            Toast.makeText(this, "Invalid URL: $raw", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         prefs.addUrl(finalUrl)
         urlInput.text.clear()
@@ -81,9 +86,18 @@ class UrlListActivity : FragmentActivity() {
         Toast.makeText(this, "Added: $finalUrl", Toast.LENGTH_SHORT).show()
     }
 
+    private fun isValidUrl(url: String): Boolean {
+        return try {
+            val parsed = java.net.URL(url)
+            parsed.protocol in listOf("http", "https") && parsed.host.contains(".")
+        } catch (_: Exception) {
+            false
+        }
+    }
+
     private fun setupQrCode() {
         val qrImage = findViewById<ImageView>(R.id.qr_image)
-        val qrStatus = findViewById<TextView>(R.id.qr_status)
+        val qrStatus = findViewById     <TextView>(R.id.qr_status)
 
         val ip = getDeviceIp()
         if (ip == null) {
@@ -169,9 +183,12 @@ class UrlListActivity : FragmentActivity() {
                 layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
             }
 
-            val deleteBtn = ImageView(parent.context).apply {
-                setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-                setPadding(16, 16, 16, 16)
+            val deleteBtn = TextView(parent.context).apply {
+                text = "DELETE"
+                textSize = 14f
+                setTextColor(Color.parseColor("#FF6666"))
+                setPadding(24, 12, 24, 12)
+                setBackgroundColor(Color.parseColor("#2A1A1A"))
                 isFocusable = true
                 isFocusableInTouchMode = true
                 layoutParams = LinearLayout.LayoutParams(
@@ -179,9 +196,13 @@ class UrlListActivity : FragmentActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
                 setOnFocusChangeListener { v, hasFocus ->
-                    v.alpha = if (hasFocus) 1.0f else 0.5f
+                    (v as TextView).setBackgroundColor(
+                        if (hasFocus) Color.parseColor("#CC3333") else Color.parseColor("#2A1A1A")
+                    )
+                    v.setTextColor(
+                        if (hasFocus) Color.WHITE else Color.parseColor("#FF6666")
+                    )
                 }
-                alpha = 0.5f
             }
 
             row.addView(urlText)
@@ -218,7 +239,7 @@ class UrlListActivity : FragmentActivity() {
         inner class ViewHolder(
             val row: LinearLayout,
             val urlText: TextView,
-            val deleteBtn: ImageView
+            val deleteBtn: TextView
         ) : RecyclerView.ViewHolder(row)
     }
 }

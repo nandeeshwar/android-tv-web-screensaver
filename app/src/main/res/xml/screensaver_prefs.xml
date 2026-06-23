@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="Web Screensaver"
+    android:summary="Display any website as your TV screensaver">
 
-    <Preference
-        android:key="manage_urls"
-        android:summary="Add or remove URLs"
-        android:title="Manage URLs" />
+    <PreferenceCategory android:title="URLs">
 
-    <ListPreference
-        android:key="screensaver_selected_url"
-        android:summary="None selected"
-        android:title="Default URL" />
+        <Preference
+            android:key="manage_urls"
+            android:summary="Add or remove URLs"
+            android:title="Manage URLs" />
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="enable_javascript"
-        android:summary="Required for most modern websites"
-        android:title="Enable JavaScript" />
+        <ListPreference
+            android:key="screensaver_selected_url"
+            android:summary="None selected"
+            android:title="Default URL" />
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:key="enable_interaction"
-        android:summary="Allow navigating the website with the remote"
-        android:title="Interactive mode" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Display">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="enable_javascript"
+            android:summary="Required for most modern websites"
+            android:title="Enable JavaScript" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="enable_interaction"
+            android:summary="Allow navigating the website with the remote"
+            android:title="Interactive mode" />
+
+    </PreferenceCategory>
+
 
 </PreferenceScreen>
