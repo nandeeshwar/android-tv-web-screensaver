@@ -40,6 +40,16 @@ output.json
 # Google Services
 google-services.json
 
+# Fastlane
+fastlane/play-store-key.json
+fastlane/report.xml
+fastlane/README.md
+
+# Ruby
+vendor/
+.bundle/
+Gemfile.lock
+
 # OS files
 .DS_Store
 Thumbs.db

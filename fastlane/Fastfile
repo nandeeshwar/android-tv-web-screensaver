@@ -1,0 +1,34 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build debug APK"
+  lane :debug do
+    gradle(task: "assembleDebug")
+  end
+
+  desc "Build release APK and AAB"
+  lane :build_release do
+    gradle(task: "assembleRelease")
+    gradle(task: "bundleRelease")
+  end
+
+  desc "Deploy to Play Store internal track"
+  lane :internal do
+    gradle(task: "bundleRelease")
+    upload_to_play_store(
+      track: "internal",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+  desc "Promote internal to production"
+  lane :production do
+    upload_to_play_store(
+      track: "internal",
+      track_promote_to: "production"
+    )
+  end
+end
