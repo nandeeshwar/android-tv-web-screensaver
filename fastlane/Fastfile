@@ -13,14 +13,19 @@ platform :android do
   end
 
   desc "Deploy to Play Store internal track"
-  lane :internal do
+  desc "Usage: fastlane internal version_name:1.2"
+  lane :internal do |options|
+    version_name = options[:version_name]
+    UI.user_error!("Missing version_name. Usage: fastlane internal version_name:1.2") if version_name.to_s.empty?
+
     version_codes = google_play_track_version_codes(track: "internal")
     next_code = (version_codes.max || 0) + 1
-    UI.message("Building with versionCode #{next_code}")
+    UI.message("Building versionName #{version_name} with versionCode #{next_code}")
     gradle(
       task: "bundleRelease",
       properties: {
-        "versionCode" => next_code
+        "versionCode" => next_code,
+        "versionName" => version_name
       }
     )
     upload_to_play_store(
