@@ -1,21 +1,27 @@
 # Android TV Web Screensaver
 
-A simple Android TV screensaver that displays any website. Configure the URL, enable JavaScript, and optionally interact with the page using your remote.
+Display any website as your Android TV screensaver. Add URLs manually or scan a QR code with your phone.
 
 ## Features
 
 - Display any website as your TV screensaver
-- Configurable URL via a TV-friendly settings screen
+- Add URLs manually or scan a QR code from your phone
+- Start the screensaver directly from the app (no system settings required)
 - JavaScript toggle for compatibility with modern sites
-- Optional interactive mode to navigate with your remote
+- Interactive mode to navigate the website with your remote
 - Hardware-accelerated WebView rendering
+- Responsive settings UI for both TV and phone
 
 ## Setup
 
 1. Install the app on your Android TV
-2. Go to **Settings > Device Preferences > Screen saver**
-3. Select **Web Screensaver**
-4. Tap the gear icon to configure the URL
+2. Open **Web Screensaver** from the launcher
+3. Add a URL (manually or via QR code)
+4. Tap **Start Screensaver** to preview
+
+To use as the system screensaver:
+1. Go to **Settings > System > Screen saver** (or **Settings > Device Preferences > Screen saver**)
+2. Select **Web Screensaver**
 
 ## Building
 
@@ -31,6 +37,14 @@ Install via adb:
 adb install app/build/outputs/apk/debug/app-debug.apk
 ```
 
+## Deploying to Play Store
+
+```bash
+bundle install
+bundle exec fastlane android internal      # Upload to internal testing
+bundle exec fastlane android production     # Promote to production
+```
+
 ## Testing on emulator
 
 Create an **Android TV (1080p)** virtual device in Android Studio, then:
@@ -43,7 +57,7 @@ Create an **Android TV (1080p)** virtual device in Android Studio, then:
 adb shell am start-dream
 
 # Open settings directly
-adb shell am start -n com.nandeesh.screensaver/.SettingsActivity
+adb shell am start -n app.digiplex.screensaver/.SettingsActivity
 ```
 
 ## License

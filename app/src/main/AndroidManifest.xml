@@ -43,6 +43,11 @@
         </activity>
 
         <activity
+            android:name=".ScreensaverActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Screensaver" />
+
+        <activity
             android:name=".UrlListActivity"
             android:exported="false"
             android:theme="@style/Theme.Screensaver" />

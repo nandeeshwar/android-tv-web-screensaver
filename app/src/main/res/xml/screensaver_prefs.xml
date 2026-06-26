@@ -33,5 +33,13 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory android:title="Actions">
+
+        <Preference
+            android:key="start_screensaver"
+            android:title="Start Screensaver"
+            android:summary="Preview the screensaver now" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>

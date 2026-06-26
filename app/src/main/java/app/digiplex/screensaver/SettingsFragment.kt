@@ -2,6 +2,7 @@ package app.digiplex.screensaver
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
@@ -19,6 +20,16 @@ class SettingsFragment : LeanbackPreferenceFragmentCompat() {
         findPreference<ListPreference>(ScreensaverPrefs.KEY_SELECTED_URL)?.setOnPreferenceChangeListener { _, newValue ->
             ScreensaverPrefs(requireContext()).setSelected(newValue as String)
             refreshUrlPreferences()
+            true
+        }
+
+        findPreference<Preference>("start_screensaver")?.setOnPreferenceClickListener {
+            val prefs = ScreensaverPrefs(requireContext())
+            if (prefs.activeUrl.isBlank()) {
+                Toast.makeText(requireContext(), "Add a URL first", Toast.LENGTH_SHORT).show()
+            } else {
+                startActivity(Intent(requireContext(), ScreensaverActivity::class.java))
+            }
             true
         }
 
