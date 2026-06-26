@@ -2,74 +2,74 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:background="#1A1A2E">
 
-    <!-- Left panel: App branding -->
-    <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+    <!-- Top: App branding (compact for phone) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌐"
+            android:textSize="40sp"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Web Screensaver for TV"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Display any website as your screensaver. Add URLs manually or scan a QR code with your phone."
+            android:textColor="#AAAACC"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:lineSpacingExtra="3dp"
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:padding="48dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🌐"
-                android:textSize="64sp"
-                android:layout_marginBottom="24dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Web Screensaver\nfor TV"
-                android:textColor="#FFFFFF"
-                android:textSize="32sp"
-                android:gravity="center"
-                android:lineSpacingExtra="4dp"
-                android:layout_marginBottom="16dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Display any website as your screensaver.\nAdd URLs manually or scan a QR code\nwith your phone."
-                android:textColor="#AAAACC"
-                android:textSize="16sp"
-                android:gravity="center"
-                android:lineSpacingExtra="4dp"
-                android:layout_marginBottom="32dp" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/version_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#666688"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="github.com/nandeeshwar/android-tv-web-screensaver"
+                android:text=" · github.com/nandeeshwar/android-tv-web-screensaver"
                 android:textColor="#6666AA"
-                android:textSize="12sp"
-                android:layout_marginTop="8dp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
-    </FrameLayout>
+    </LinearLayout>
 
-    <!-- Right panel: Settings fragment -->
+    <!-- Bottom: Settings fragment -->
     <FrameLayout
         android:id="@+id/settings_container"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1" />
 
 </LinearLayout>
